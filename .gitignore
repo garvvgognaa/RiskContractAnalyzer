@@ -19,3 +19,7 @@ dist/
 build/
 
 docs/report.txt
+
+# Secrets
+.streamlit/secrets.toml
+.env
