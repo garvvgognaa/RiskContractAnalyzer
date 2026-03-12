@@ -1,0 +1,22 @@
+[
+  {
+    "id": "G1",
+    "topic": "Indemnification",
+    "content": "An indemnification clause should clearly specify the scope of losses covered. Uncapped liability is highly risky and should be avoided or explicitly capped."
+  },
+  {
+    "id": "G2",
+    "topic": "Termination",
+    "content": "Termination for convenience should ideally require at least 30 days written notice to allow for a proper transition of services."
+  },
+  {
+    "id": "G3",
+    "topic": "Confidentiality",
+    "content": "Confidentiality obligations should have a clear expiration date, typically 2 to 5 years after termination, unless it pertains to trade secrets."
+  },
+  {
+    "id": "G4",
+    "topic": "Limitation of Liability",
+    "content": "Liability should be capped at the total amount paid under the contract over the preceding 12 months to avoid catastrophic financial risk."
+  }
+]
