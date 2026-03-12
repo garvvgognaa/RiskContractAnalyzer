@@ -22,6 +22,7 @@ The **Legal Contract Risk Analyzer** is a single-page Streamlit web application 
 | 📊 **KPI Dashboard** | Summary tiles: total / risky / safe clause counts + risk % |
 | 🎨 **Premium Dark UI** | Gradient header, styled cards, confidence bars, filter tabs |
 | 🏷️ **Risk Categories** | Identifies category of risk (Liability, Termination, IP, etc.) |
+| 🤖 **Agentic AI** | (Milestone 2) LLM-powered legal assistant for risk assessment |
 
 ---
 
