@@ -1,0 +1,17 @@
+[
+  {
+    "id": "R1",
+    "topic": "Automatic Renewal",
+    "content": "Evergreen clauses (automatic renewals) without prior notification can lock the party into unwanted extensions. Ensure there is a clear opt-out window."
+  },
+  {
+    "id": "R2",
+    "topic": "Unilateral Amendments",
+    "content": "Clauses that allow one party to change the terms of the agreement unilaterally are highly risky. Any amendments should require written consent from both parties."
+  },
+  {
+    "id": "R3",
+    "topic": "Jurisdiction",
+    "content": "Dispute resolution in a foreign or unfavorable jurisdiction increases litigation costs. The governing law and venue should be neutral or favorable."
+  }
+]
