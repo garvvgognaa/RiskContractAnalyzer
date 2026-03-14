@@ -1,0 +1,17 @@
+[
+  {
+    "id": "BP1",
+    "topic": "Payment Terms",
+    "content": "Net 30 or Net 60 days are standard payment terms. Late payment penalties should not exceed 1.5% per month."
+  },
+  {
+    "id": "BP2",
+    "topic": "Force Majeure",
+    "content": "Ensure the Force Majeure clause covers pandemics, cyber-attacks, and natural disasters, and provides a clear mechanism for resuming obligations."
+  },
+  {
+    "id": "BP3",
+    "topic": "Data Privacy",
+    "content": "Any contract involving PII should reference compliance with GDPR, CCPA, or applicable data protection laws, and mandate breach notifications within 48-72 hours."
+  }
+]
