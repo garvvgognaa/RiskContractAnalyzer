@@ -12,10 +12,29 @@ class LegalKnowledgeRetriever:
         self.dimension = self.model.get_sentence_embedding_dimension()
         
     def load_knowledge_base(self, data_dir="data/knowledge_base"):
-        pass
+        if not os.path.exists(data_dir):
+            return
+        
+        for filename in os.listdir(data_dir):
+            if filename.endswith(".json"):
+                file_path = os.path.join(data_dir, filename)
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        if isinstance(data, list):
+                            self.knowledge_base.extend(data)
+                except Exception as e:
+                    print(f"Error loading {file_path}: {e}")
 
     def build_index(self):
-        pass
+        if not self.knowledge_base:
+            return
+            
+        texts = [f"{item.get('topic', '')}: {item.get('content', '')}" for item in self.knowledge_base]
+        embeddings = self.model.encode(texts, convert_to_numpy=True)
+        
+        self.index = faiss.IndexFlatL2(self.dimension)
+        self.index.add(embeddings)
 
     def get_relevant_guidelines(self, clause_text: str, top_k: int = 3):
         pass
