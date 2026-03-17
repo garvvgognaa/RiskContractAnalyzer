@@ -37,7 +37,19 @@ class LegalKnowledgeRetriever:
         self.index.add(embeddings)
 
     def get_relevant_guidelines(self, clause_text: str, top_k: int = 3):
-        pass
+        if not self.index or not self.knowledge_base:
+            return []
+            
+        query_embedding = self.model.encode([clause_text], convert_to_numpy=True)
+        distances, indices = self.index.search(query_embedding, top_k)
+        
+        results = []
+        for i in range(len(indices[0])):
+            idx = indices[0][i]
+            if idx != -1 and idx < len(self.knowledge_base):
+                results.append(self.knowledge_base[idx])
+                
+        return results
 
 # Global instance
 _retriever = None
