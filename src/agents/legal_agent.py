@@ -54,6 +54,7 @@ class LegalAgent:
                         "clause_id": clause.get('id', 'unknown'),
                         "guidelines_found": len(guidelines)
                     })
+                    print(f"Retrieved {len(guidelines)} guidelines for clause: {clause.get('id', 'unknown')}")
             
             self.set_state(AgentState.REPORTING)
             # 3. Generate structured contract risk reports
