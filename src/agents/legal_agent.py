@@ -63,3 +63,23 @@ class LegalAgent:
         except Exception as e:
             self.set_state(AgentState.ERROR)
             return None
+
+    def generate_report(self, clauses: List[Dict[str, Any]]) -> Dict[str, Any]:
+        clauses_data = json.dumps([{
+            "text": c.get('text'), "risk_severity": c.get('risk_severity')
+        } for c in clauses], indent=2)
+        
+        prompt = REPORT_SUMMARY_TEMPLATE.format(clauses_data=clauses_data)
+        response_text = self.llm.generate_response(prompt, system_instruction=SYSTEM_PROMPT)
+        
+        try:
+            cleaned_response = response_text.strip().strip('`').strip('json').strip()
+            report_meta = json.loads(cleaned_response)
+        except:
+            report_meta = {"contract_summary": "Error", "legal_disclaimer": "AI disclaimer"}
+            
+        final_report = {"report_metadata": report_meta, "risky_clauses": clauses, "analysis_history": self.history}
+        os.makedirs("data/reports", exist_ok=True)
+        with open("data/reports/analysis_report.json", "w") as f:
+            json.dump(final_report, f, indent=4)
+        return final_report
