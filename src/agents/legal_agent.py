@@ -53,9 +53,13 @@ class LegalAgent:
                 try:
                     cleaned_response = response_text.strip().strip('`').strip('json').strip()
                     clause.update(json.loads(cleaned_response))
-                except:
-                    clause.update({"risk_severity": "Unknown", "explanation": "Failed analysis."})
-            
+                except Exception as e:
+                    clause.update({
+                        "risk_severity": "Unknown",
+                        "explanation": "Failed to analyze clause.",
+                        "mitigation": "Manual review recommended."
+                    })
+
             self.set_state(AgentState.REPORTING)
             self.report = self.generate_report(clauses)
             self.set_state(AgentState.COMPLETED)
@@ -66,7 +70,9 @@ class LegalAgent:
 
     def generate_report(self, clauses: List[Dict[str, Any]]) -> Dict[str, Any]:
         clauses_data = json.dumps([{
-            "text": c.get('text'), "risk_severity": c.get('risk_severity')
+            "text": c.get('text'),
+            "risk_severity": c.get('risk_severity'),
+            "explanation": c.get('explanation')
         } for c in clauses], indent=2)
         
         prompt = REPORT_SUMMARY_TEMPLATE.format(clauses_data=clauses_data)
@@ -75,11 +81,21 @@ class LegalAgent:
         try:
             cleaned_response = response_text.strip().strip('`').strip('json').strip()
             report_meta = json.loads(cleaned_response)
-        except:
-            report_meta = {"contract_summary": "Error", "legal_disclaimer": "AI disclaimer"}
+        except Exception as e:
+            report_meta = {
+                "contract_summary": "Error generating summary.",
+                "legal_disclaimer": "AI usage disclaimer: Manual review required."
+            }
             
-        final_report = {"report_metadata": report_meta, "risky_clauses": clauses, "analysis_history": self.history}
+        final_report = {
+            "report_metadata": report_meta,
+            "risky_clauses": clauses,
+            "analysis_history": self.history
+        }
+        
         os.makedirs("data/reports", exist_ok=True)
-        with open("data/reports/analysis_report.json", "w") as f:
+        report_path = "data/reports/analysis_report.json"
+        with open(report_path, "w") as f:
             json.dump(final_report, f, indent=4)
+        
         return final_report
