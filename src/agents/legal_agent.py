@@ -99,3 +99,13 @@ class LegalAgent:
             json.dump(final_report, f, indent=4)
         
         return final_report
+
+if __name__ == "__main__":
+    agent = LegalAgent()
+    sample_clauses = [
+        {"id": 1, "text": "The company shall not be liable for any damages."},
+        {"id": 2, "text": "All disputes shall be settled in Mars."}
+    ]
+    report = agent.run_analysis("Mock contract", sample_clauses)
+    if report:
+        print("Analysis completed.")
