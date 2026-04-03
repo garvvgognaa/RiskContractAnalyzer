@@ -194,9 +194,6 @@ def render_risky_clause(clause: Dict) -> None:
         f"""
         <div class="risky-card">
             <div class="clause-header">
-                <span style="color:{COLOUR['text_secondary']};font-size:12px;font-weight:600;">
-                    CLAUSE #{clause['id']}
-                </span>
                 <span class="badge-risky">⚠ RISKY</span>
                 <span style="font-size:12px;color:{COLOUR['text_secondary']};margin-left:auto;">
                     {conf_pct}% confidence
@@ -217,6 +214,12 @@ def render_risky_clause(clause: Dict) -> None:
         unsafe_allow_html=True,
     )
 
+def render_risky_clause_expander(clause: Dict) -> None:
+    """Wrapper using st.expander for risky clauses."""
+    conf_pct = int(clause["confidence"] * 100)
+    with st.expander(f"⚠️ CLAUSE #{clause['id']} (Risky) - {conf_pct}% Confidence", expanded=False):
+        render_risky_clause(clause)
+
 
 def render_safe_clause(clause: Dict) -> None:
     """
@@ -231,9 +234,6 @@ def render_safe_clause(clause: Dict) -> None:
         f"""
         <div class="safe-card">
             <div class="clause-header">
-                <span style="color:{COLOUR['text_secondary']};font-size:12px;font-weight:600;">
-                    CLAUSE #{clause['id']}
-                </span>
                 <span class="badge-safe">✔ SAFE</span>
                 <span style="font-size:12px;color:{COLOUR['text_secondary']};margin-left:auto;">
                     {conf_pct}% confidence
@@ -248,6 +248,12 @@ def render_safe_clause(clause: Dict) -> None:
         unsafe_allow_html=True,
     )
 
+def render_safe_clause_expander(clause: Dict) -> None:
+    """Wrapper using st.expander for safe clauses."""
+    conf_pct = int(clause["confidence"] * 100)
+    with st.expander(f"✅ CLAUSE #{clause['id']} (Safe) - {conf_pct}% Confidence", expanded=False):
+        render_safe_clause(clause)
+
 
 def render_clause_list(analyzed_clauses: List[Dict], show_safe: bool = True) -> None:
     """
@@ -259,6 +265,6 @@ def render_clause_list(analyzed_clauses: List[Dict], show_safe: bool = True) -> 
     """
     for clause in analyzed_clauses:
         if clause["label"] == "Risky":
-            render_risky_clause(clause)
+            render_risky_clause_expander(clause)
         elif show_safe:
-            render_safe_clause(clause)
+            render_safe_clause_expander(clause)
