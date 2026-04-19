@@ -1,4 +1,8 @@
-   
+import os
+import streamlit as st
+
+if not os.path.exists("models/best_model.joblib"):
+    st.warning("Warning: ML model not found. The app will use rule-based risk detection until models are pushed/trained.")
 
 import time
 import json
