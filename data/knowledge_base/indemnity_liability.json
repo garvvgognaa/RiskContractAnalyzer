@@ -1,0 +1,18 @@
+[
+  {
+    "topic": "Indemnity Clauses",
+    "content": "Indemnification clauses should be mutual and capped at a defined limit (e.g., total contract value). One-sided indemnification that holds only one party harmless for all claims is considered highly risky. Best practice: require both parties to indemnify each other for their own negligence only, and exclude indirect/consequential damages from indemnity scope."
+  },
+  {
+    "topic": "Hold Harmless Agreements",
+    "content": "A 'hold harmless' clause transfers liability from one party to another. Broad hold harmless clauses that cover all claims including third-party actions and gross negligence should be avoided or negotiated down. Always ensure insurance requirements are tied to hold harmless obligations."
+  },
+  {
+    "topic": "Limitation of Liability",
+    "content": "Limitation of liability clauses cap the maximum amount one party can recover from the other. The cap should be proportional to the contract value — typically equal to fees paid in the prior 12 months. Caps that are too low (e.g., $100) are almost certainly unenforceable. Exclusions for fraud, willful misconduct, death/personal injury, and IP infringement are standard."
+  },
+  {
+    "topic": "Gross Negligence Standard",
+    "content": "Gross negligence represents a higher threshold than ordinary negligence, involving reckless disregard. Clauses that limit liability only for gross negligence (not ordinary negligence) shift significant risk to the non-drafting party. Ensure gross negligence and willful misconduct are always excluded from any liability cap or indemnification carve-out."
+  }
+]

@@ -1,13 +1,11 @@
-"""
-utils/risk_predictor.py
-------------------------
-Dummy rule-based risk prediction engine.
-Uses keyword matching against a curated list of risky legal terms.
-In a production system, this would be replaced by a trained ML model.
-"""
+   
 
 import re
+import os
+import joblib
+import numpy as np
 from typing import Dict, List
+
 from app_config import (
     RISK_KEYWORDS,
     RISK_KEYWORD_THRESHOLD,
@@ -15,9 +13,40 @@ from app_config import (
     SAFE_CONFIDENCE,
 )
 
-# ---------------------------------------------------------------------------
-# Risk category mapping for richer UI context
-# ---------------------------------------------------------------------------
+                                                                             
+                                                                  
+                                                                             
+_MODEL_PATH      = os.path.join("models", "best_model.joblib")
+_VECTORIZER_PATH = os.path.join("models", "vectorizer.joblib")
+
+                                                                             
+                                       
+                                                                             
+_model      = None
+_vectorizer = None
+_use_ml     = False                                              
+
+
+def _load_model() -> None:
+                                                                             
+    global _model, _vectorizer, _use_ml
+    if _use_ml:                          
+        return
+    if os.path.exists(_MODEL_PATH) and os.path.exists(_VECTORIZER_PATH):
+        try:
+            _model      = joblib.load(_MODEL_PATH)
+            _vectorizer = joblib.load(_VECTORIZER_PATH)
+            _use_ml     = True
+            print("[RiskPredictor] Loaded trained ML model from disk.")
+        except Exception as exc:
+            print(f"[RiskPredictor] Failed to load model — falling back to rule-based. ({exc})")
+    else:
+        print("[RiskPredictor] No saved model found — using rule-based keyword predictor.")
+
+
+                                                                             
+                                             
+                                                                             
 _CATEGORY_MAP: Dict[str, str] = {
     "indemnify":           "Indemnity",
     "indemnification":     "Indemnity",
@@ -65,82 +94,109 @@ _CATEGORY_MAP: Dict[str, str] = {
 }
 
 
-def predict_clause_risk(clause: Dict) -> Dict:
-    """
-    Predicts whether a single clause is Risky or Safe.
+                                                                             
+                                                                          
+                                                                             
 
-    Args:
-        clause (Dict): A clause dict with at least a 'text' key.
-
-    Returns:
-        The input dict augmented with:
-            - label           (str)  : "Risky" or "Safe"
-            - confidence      (float): prediction confidence score 0–1
-            - matched_keywords (list): keywords found in the clause
-            - categories      (list): risk categories from matched keywords
-    """
-    text_lower = clause["text"].lower()
+def _extract_keywords(text: str) -> List[str]:
+                                                            
+    text_lower = text.lower()
     matched = []
-
     for keyword in RISK_KEYWORDS:
         pattern = r"\b" + re.escape(keyword) + r"\b"
         if re.search(pattern, text_lower):
             matched.append(keyword)
+    return matched
 
+
+def _keywords_to_categories(matched: List[str]) -> List[str]:
+                                                                           
+    return list(dict.fromkeys(
+        _CATEGORY_MAP.get(kw, "General Risk") for kw in matched
+    ))
+
+
+                                                                             
+                          
+                                                                             
+
+def predict_clause_risk(clause: Dict) -> Dict:
+           
+    _load_model()                           
+
+    text = clause["text"]
+    matched   = _extract_keywords(text)
+    categories = _keywords_to_categories(matched)
+
+                                                                             
+                               
+                                                                             
+    if _use_ml and _model is not None and _vectorizer is not None:
+        try:
+            X_vec = _vectorizer.transform([text])
+            pred  = int(_model.predict(X_vec)[0])                       
+
+                                                                             
+            if hasattr(_model, "predict_proba"):
+                proba      = _model.predict_proba(X_vec)[0]
+                confidence = float(np.max(proba))
+            else:
+                confidence = BASE_RISKY_CONFIDENCE if pred == 1 else SAFE_CONFIDENCE
+
+            label = "Risky" if pred == 1 else "Safe"
+            return {
+                **clause,
+                "label":             label,
+                "confidence":        round(confidence, 3),
+                "matched_keywords":  matched,
+                "categories":        categories,
+                "predictor":         "ML Model",
+            }
+        except Exception as exc:
+            print(f"[RiskPredictor] ML prediction failed, falling back: {exc}")
+
+                                                                             
+                                                    
+                                                                             
     is_risky = len(matched) >= RISK_KEYWORD_THRESHOLD
-
-    # Confidence scales up slightly with more keyword hits
     if is_risky:
-        bonus = min(0.10, len(matched) * 0.02)
+        bonus      = min(0.10, len(matched) * 0.02)
         confidence = round(BASE_RISKY_CONFIDENCE + bonus, 3)
-        label = "Risky"
+        label      = "Risky"
     else:
         confidence = SAFE_CONFIDENCE
-        label = "Safe"
-
-    categories = list(
-        dict.fromkeys(
-            _CATEGORY_MAP.get(kw, "General Risk") for kw in matched
-        )
-    )
+        label      = "Safe"
 
     return {
         **clause,
-        "label": label,
-        "confidence": confidence,
-        "matched_keywords": matched,
-        "categories": categories,
+        "label":             label,
+        "confidence":        confidence,
+        "matched_keywords":  matched,
+        "categories":        categories,
+        "predictor":         "Rule-Based",
     }
 
 
 def analyze_clauses(clauses: List[Dict]) -> List[Dict]:
-    """
-    Runs risk prediction on a list of clause dicts.
-
-    Args:
-        clauses (List[Dict]): Output from clause_segmenter.segment_document()
-
-    Returns:
-        List of clause dicts with risk prediction fields added.
-    """
+           
     return [predict_clause_risk(c) for c in clauses]
 
 
 def compute_summary_stats(analyzed_clauses: List[Dict]) -> Dict:
-    """
-    Computes summary statistics for display in KPI tiles.
-
-    Returns:
-        dict with total, risky_count, safe_count, risk_percentage
-    """
-    total = len(analyzed_clauses)
-    risky = sum(1 for c in analyzed_clauses if c["label"] == "Risky")
-    safe = total - risky
+           
+    total  = len(analyzed_clauses)
+    risky  = sum(1 for c in analyzed_clauses if c["label"] == "Risky")
+    safe   = total - risky
     risk_pct = round((risky / total * 100) if total > 0 else 0.0, 1)
 
+                                                            
+    predictors = [c.get("predictor", "Rule-Based") for c in analyzed_clauses]
+    predictor  = max(set(predictors), key=predictors.count) if predictors else "Rule-Based"
+
     return {
-        "total": total,
-        "risky_count": risky,
-        "safe_count": safe,
+        "total":          total,
+        "risky_count":    risky,
+        "safe_count":     safe,
         "risk_percentage": risk_pct,
+        "predictor":      predictor,
     }

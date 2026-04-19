@@ -1,17 +1,7 @@
-"""
-app.py
-------
-Legal Contract Risk Analyzer — Single-page Streamlit Application.
-
-Pipeline:
-    Upload (PDF/TXT) → Text Extraction → Clause Segmentation
-    → Risk Prediction → Results Display
-
-Usage:
-    streamlit run app.py
-"""
+   
 
 import time
+import json
 import streamlit as st
 
 from app_config import (
@@ -31,20 +21,32 @@ from components.result_display import (
     render_clause_list,
 )
 
-# ---------------------------------------------------------------------------
-# Page config — must be first Streamlit call
-# ---------------------------------------------------------------------------
+                     
+from src.agents.legal_agent import LegalAgent, AgentState
+
+                                                                             
+                                            
+                                                                             
 st.set_page_config(
     page_title="Legal Risk Analyzer",
-    page_icon="⚖️",
+    page_icon="[Risk]",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 
-# ---------------------------------------------------------------------------
-# Global CSS overrides
-# ---------------------------------------------------------------------------
+                                                                             
+                              
+                                                                             
+if "agent_report" not in st.session_state:
+    st.session_state.agent_report = None
+if "last_analyzed_file" not in st.session_state:
+    st.session_state.last_analyzed_file = None
+
+
+                                                                             
+                      
+                                                                             
 def _inject_global_styles() -> None:
     st.markdown(
         f"""
@@ -164,27 +166,50 @@ def _inject_global_styles() -> None:
             color: {COLOUR['accent_light']} !important;
             border-bottom-color: {COLOUR['accent']} !important;
         }}
+        
+        /* Agent Report Styles */
+        .agent-card {{
+            background: {COLOUR['bg_card']};
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }}
+        .agent-severity-high {{ border-left: 5px solid {COLOUR['border_risky']}; }}
+        .agent-severity-medium {{ border-left: 5px solid #F5A623; }}
+        .agent-severity-low {{ border-left: 5px solid {COLOUR['border_safe']}; }}
+        
+        .agent-label {{
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }}
         </style>
         """,
         unsafe_allow_html=True,
     )
 
 
-# ---------------------------------------------------------------------------
-# Sidebar
-# ---------------------------------------------------------------------------
+                                                                             
+         
+                                                                             
 def _render_sidebar() -> bool:
-    """Renders the sidebar and returns the show_safe_clauses toggle value."""
+                                                                             
     with st.sidebar:
         st.markdown(
             f"""
             <div style="text-align:center; padding: 16px 0 24px;">
-                <div style="font-size:2.8rem;">⚖️</div>
+                <div style="font-size:2.8rem;">[Risk]</div>
                 <div style="font-weight:800;font-size:1.1rem;color:{COLOUR['text_primary']};">
                     Contract Analyzer
                 </div>
                 <div style="font-size:11px;color:{COLOUR['text_secondary']};margin-top:4px;">
-                    Powered by Rule-Based NLP
+                    Powered by Trained ML & Agentic AI
                 </div>
             </div>
             """,
@@ -200,17 +225,17 @@ def _render_sidebar() -> bool:
 
         st.markdown("---")
 
-        st.markdown("### 🔍 Risk Legend")
+        st.markdown("### Risk Legend")
         st.markdown(
             f"""
             <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
                 <div>
-                    <span style="color:{COLOUR['border_risky']};font-weight:700;">⚠ RISKY</span>
-                    &nbsp;— Contains risk keywords
+                    <span style="color:{COLOUR['border_risky']};font-weight:700;">[!] RISKY</span>
+                    &nbsp;— Flagged by ML Model
                 </div>
                 <div>
-                    <span style="color:{COLOUR['border_safe']};font-weight:700;">✔ SAFE</span>
-                    &nbsp;— No risk keywords found
+                    <span style="color:{COLOUR['border_safe']};font-weight:700;">[OK] SAFE</span>
+                    &nbsp;— High confidence safe
                 </div>
             </div>
             """,
@@ -223,9 +248,9 @@ def _render_sidebar() -> bool:
     return show_safe
 
 
-# ---------------------------------------------------------------------------
-# Hero Header
-# ---------------------------------------------------------------------------
+                                                                             
+             
+                                                                             
 def _render_hero() -> None:
     st.markdown(
         f"""
@@ -238,11 +263,11 @@ def _render_hero() -> None:
     )
 
 
-# ---------------------------------------------------------------------------
-# File upload section
-# ---------------------------------------------------------------------------
+                                                                             
+                     
+                                                                             
 def _render_upload_section():
-    st.markdown('<div class="section-title">📄 Upload Contract Document</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Upload Contract Document</div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader(
         label="Drag & drop your contract here, or click to browse",
         type=["pdf", "txt"],
@@ -252,21 +277,23 @@ def _render_upload_section():
     return uploaded_file
 
 
-# ---------------------------------------------------------------------------
-# Analysis pipeline
-# ---------------------------------------------------------------------------
+                                                                             
+                   
+                                                                             
 def _run_pipeline(uploaded_file):
-    """
-    Runs the full analysis pipeline with a status block.
-    Returns (analyzed_clauses, stats, metadata) or (None, None, None) on error.
-    """
+           
     meta = get_file_metadata(uploaded_file)
 
-    # Show file info
+                                        
+    if st.session_state.last_analyzed_file != meta['name']:
+        st.session_state.agent_report = None
+        st.session_state.last_analyzed_file = meta['name']
+
+                    
     st.markdown(
         f"""
         <div class="file-chip">
-            <span>📎</span>
+            <span>[File]</span>
             <strong>{meta['name']}</strong>
             &nbsp;|&nbsp; {meta['file_type']} &nbsp;|&nbsp; {meta['size_kb']} KB
         </div>
@@ -275,105 +302,118 @@ def _run_pipeline(uploaded_file):
     )
 
     try:
-        with st.status("Agent Reasoning Process", expanded=True) as status:
-            # Step 1: Extract text
-            st.write("📖 Searching document and extracting text...")
+        with st.status("Preprocessing & Risk Prediction", expanded=True) as status:
+                                  
+            st.write("Searching document and extracting text...")
             time.sleep(0.3)
             text = extract_text_from_upload(uploaded_file)
 
             if not text or not text.strip():
                 status.update(label="Analysis failed", state="error", expanded=True)
-                st.error("⚠️ Could not extract any text from the document. Please ensure the file is not empty or corrupted, and try again.")
-                return None, None, None
+                st.error("Could not extract any text from the document.")
+                return None, None, None, None
 
-            # Step 2: Segment clauses
-            st.write("✂️ Segmenting document into logical clauses...")
+                                     
+            st.write("Segmenting document into logical clauses...")
             time.sleep(0.3)
             clauses = segment_document(text)
 
             if not clauses:
                 status.update(label="Analysis failed", state="error", expanded=True)
-                st.warning("⚠️ No distinct clauses could be extracted from this document. Try providing a structured contract rather than unstructured notes.")
-                return None, None, None
+                st.warning("No distinct clauses could be extracted.")
+                return None, None, None, None
 
-            # Step 3: Predict risk
-            st.write("🔍 Assessing liability and risk keywords on each clause...")
+                                             
+            st.write("Running trained ML classifier...")
             time.sleep(0.3)
             analyzed = analyze_clauses(clauses)
-            stats = compute_summary_stats(analyzed)
+            stats    = compute_summary_stats(analyzed)
 
-            status.update(label="✅ Analysis complete!", state="complete", expanded=False)
+            status.update(label=f"Risk Identification Complete (Using {stats['predictor']})", state="complete", expanded=False)
 
-        return analyzed, stats, meta
+        return analyzed, stats, meta, text
 
-    except ValueError as e:
-        st.error(f"❌ File validation error: {e}. Please upload a valid PDF or TXT file.")
-        return None, None, None
     except Exception as e:
-        st.error(f"❌ Unexpected internal error during agent reasoning: {e}")
-        return None, None, None
+        st.error(f"❌ Unexpected error during pipeline: {e}")
+        return None, None, None, None
 
 
-# ---------------------------------------------------------------------------
-# Results section
-# ---------------------------------------------------------------------------
-def _render_results(analyzed_clauses, stats, meta, show_safe: bool) -> None:
+                                                                             
+                       
+                                                                             
+def _run_agent_analysis(text: str, clauses: list):
+                                                                 
+    risky_clauses = [c for c in clauses if c['label'] == 'Risky']
+    
+    if not risky_clauses:
+        st.info("No risky clauses found for deep analysis.")
+        return
+
+    agent = LegalAgent()
+    
+    with st.status("Agentic AI Legal Assistant", expanded=True) as status:
+                                            
+        def update_status(state: AgentState):
+            status.update(label=f"Agent Status: {state.value}...")
+            st.write(f"Current Phase: **{state.value}**")
+
+        agent.state_callback = update_status
+        report = agent.run_analysis(text, risky_clauses)
+        
+        if report:
+            st.session_state.agent_report = report
+            status.update(label="Deep Analysis Complete", state="complete", expanded=False)
+        else:
+            status.update(label="Agent Analysis Failed", state="error", expanded=True)
+            st.error("The legal agent encountered an error during analysis.")
+
+
+                                                                             
+                 
+                                                                             
+def _render_results(analyzed_clauses, stats, meta, text, show_safe: bool) -> None:
     st.markdown("---")
 
     col_title, col_btn = st.columns([0.7, 0.3])
     with col_title:
-        st.markdown('<div class="section-title" style="margin-top:0;">📊 Risk Summary</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title" style="margin-top:0;">📊 Analysis Dashboard</div>', unsafe_allow_html=True)
     with col_btn:
         pdf_bytes = generate_pdf_report(analyzed_clauses, stats, meta)
         st.download_button(
-            label="📄 Download Assessment",
+            label="Download Assessment",
             data=pdf_bytes,
             file_name=f"Risk_Assessment_{meta.get('name', 'Report')}.pdf",
-            mime="application/pdf",
-            help="Download a detailed PDF report of this risk assessment."
+            mime="application/pdf"
         )
 
-    # KPI summary tiles
+                       
     render_summary_metrics(stats)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Risk gauge visual
+                
     risk_pct = stats["risk_percentage"]
-    gauge_color = (
-        COLOUR["border_risky"] if risk_pct >= 50
-        else "#F5A623" if risk_pct >= 25
-        else COLOUR["border_safe"]
-    )
+    gauge_color = COLOUR["border_risky"] if risk_pct >= 50 else "#F5A623" if risk_pct >= 25 else COLOUR["border_safe"]
     st.markdown(
         f"""
-        <div style="background:{COLOUR['bg_card']};border-radius:12px;padding:18px 24px;
-                    border:1px solid rgba(255,255,255,0.08);margin-bottom:28px;">
+        <div style="background:{COLOUR['bg_card']};border-radius:12px;padding:18px 24px;border:1px solid rgba(255,255,255,0.08);margin-bottom:28px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-                <span style="font-size:14px;color:{COLOUR['text_secondary']};font-weight:500;">
-                    Overall Contract Risk
-                </span>
+                <span style="font-size:14px;color:{COLOUR['text_secondary']};font-weight:500;">Overall Contract Risk Profile</span>
                 <span style="font-size:14px;color:{gauge_color};font-weight:700;">{risk_pct}%</span>
             </div>
             <div style="background:rgba(255,255,255,0.08);border-radius:6px;height:10px;">
-                <div style="width:{risk_pct}%;background:linear-gradient(90deg,{gauge_color}88,{gauge_color});
-                            height:10px;border-radius:6px;transition:width 0.6s ease;"></div>
+                <div style="width:{risk_pct}%;background:linear-gradient(90deg,{gauge_color}88,{gauge_color});height:10px;border-radius:6px;"></div>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Clause list with filter tabs
-    st.markdown('<div class="section-title">📋 Clause Analysis</div>', unsafe_allow_html=True)
-
-    risky_count = stats["risky_count"]
-    safe_count  = stats["safe_count"]
-
-    tab_all, tab_risky, tab_safe = st.tabs([
+          
+    tab_all, tab_risky, tab_agent = st.tabs([
         f"All ({stats['total']})",
-        f"⚠️ Risky ({risky_count})",
-        f"✅ Safe ({safe_count})",
+        f"Risks Identified ({stats['risky_count']})",
+        "AI Deep Analysis"
     ])
 
     with tab_all:
@@ -384,40 +424,68 @@ def _render_results(analyzed_clauses, stats, meta, show_safe: bool) -> None:
         if risky_clauses:
             render_clause_list(risky_clauses, show_safe=False)
         else:
-            st.success("🎉 No risky clauses were found in this document!")
+            st.success("No risky clauses were identified by the ML model.")
 
-    with tab_safe:
-        safe_clauses = [c for c in analyzed_clauses if c["label"] == "Safe"]
-        if safe_clauses:
-            render_clause_list(safe_clauses, show_safe=True)
+    with tab_agent:
+        st.markdown("### AI Deep Analysis")
+        st.markdown("Get clause-level explanations, risk severity assessments, and mitigation strategies powered by RAG and LLMs.")
+        
+        if st.session_state.agent_report is None:
+            if stats['risky_count'] > 0:
+                if st.button("Run AI Deep Analysis", use_container_width=True):
+                    _run_agent_analysis(text, analyzed_clauses)
+                    st.rerun()
+            else:
+                st.info("No risky clauses found to analyze.")
         else:
-            st.warning("All clauses were flagged as risky.")
-
-
-# ---------------------------------------------------------------------------
-# Empty state
-# ---------------------------------------------------------------------------
-def _render_empty_state() -> None:
-    st.markdown(
-        f"""
-        <div style="text-align:center;padding:60px 20px;color:{COLOUR['text_secondary']};">
-            <div style="font-size:5rem;margin-bottom:16px;">📜</div>
-            <div style="font-size:1.3rem;font-weight:600;color:{COLOUR['text_primary']};margin-bottom:8px;">
-                No document uploaded yet
+            report = st.session_state.agent_report
+            meta_data = report.get('report_metadata', {})
+            
+                         
+            st.markdown(f"""
+            <div class="agent-card">
+                <h4 style="margin-top:0;color:{COLOUR['accent_light']};">Contract Executive Summary</h4>
+                <p style="font-size:14px;line-height:1.6;color:{COLOUR['text_primary']};">
+                    {meta_data.get('contract_summary', 'No summary generated.')}
+                </p>
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);font-size:12px;color:{COLOUR['text_secondary']};">
+                    <b>Ethical Disclaimer:</b> {meta_data.get('legal_disclaimer', 'Not legal advice.')}
+                </div>
             </div>
-            <div style="font-size:14px;max-width:420px;margin:0 auto;">
-                Upload a PDF or TXT contract file using the uploader above
-                to instantly analyze it for risky clauses.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            """, unsafe_allow_html=True)
+            
+            if st.button("Re-run Analysis", key="rerun_agent"):
+                st.session_state.agent_report = None
+                st.rerun()
+            
+            st.markdown("#### Detailed Clause Assessments")
+            for clause in report.get('risky_clauses', []):
+                sev = clause.get('risk_severity', 'Medium')
+                sev_class = f"agent-severity-{sev.lower()}"
+                
+                st.markdown(f"""
+                <div class="agent-card {sev_class}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span class="agent-label" style="background:{COLOUR['border_risky'] if sev=='High' else '#F5A623' if sev=='Medium' else COLOUR['border_safe']};">
+                            {sev} Intensity Risk
+                        </span>
+                        <span style="font-size:12px;color:{COLOUR['text_secondary']};">Clause #{clause.get('id', '?')}</span>
+                    </div>
+                    <p style="font-weight:600;font-size:14px;margin-bottom:12px;">Original Clause:</p>
+                    <div style="font-style:italic;font-size:13px;color:{COLOUR['text_secondary']};background:rgba(0,0,0,0.2);padding:12px;border-radius:6px;margin-bottom:16px;">
+                        "{clause.get('text', '')}"
+                    </div>
+                    <p style="font-weight:600;font-size:14px;margin-bottom:4px;">AI Explanation:</p>
+                    <p style="font-size:14px;margin-bottom:16px;">{clause.get('explanation', '')}</p>
+                    <p style="font-weight:600;font-size:14px;margin-bottom:4px;">Recommended Mitigation:</p>
+                    <p style="font-size:14px;margin-bottom:0;">{clause.get('mitigation', '')}</p>
+                </div>
+                """, unsafe_allow_html=True)
 
 
-# ---------------------------------------------------------------------------
-# Main entry point
-# ---------------------------------------------------------------------------
+                                                                             
+                  
+                                                                             
 def main() -> None:
     _inject_global_styles()
     inject_card_styles()
@@ -428,18 +496,32 @@ def main() -> None:
     uploaded_file = _render_upload_section()
 
     if uploaded_file is not None:
-        analyzed_clauses, stats, meta = _run_pipeline(uploaded_file)
+        analyzed_clauses, stats, meta, text = _run_pipeline(uploaded_file)
         if analyzed_clauses is not None:
-            _render_results(analyzed_clauses, stats, meta, show_safe)
+            _render_results(analyzed_clauses, stats, meta, text, show_safe)
     else:
-        _render_empty_state()
+        st.session_state.agent_report = None
+        st.markdown(
+            f"""
+            <div style="text-align:center;padding:60px 20px;color:{COLOUR['text_secondary']};">
+                <div style="font-size:5rem;margin-bottom:16px;">(No File)</div>
+                <div style="font-size:1.3rem;font-weight:600;color:{COLOUR['text_primary']};margin-bottom:8px;">
+                    No document uploaded yet
+                </div>
+                <div style="font-size:14px;max-width:420px;margin:0 auto;">
+                    Upload a PDF or TXT contract file to start the ML-powered risk analysis and Agentic AI assistance.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-    # Footer
+            
     st.markdown(
         f"""
         <div style="text-align:center;padding:40px 0 20px;color:{COLOUR['text_secondary']};font-size:12px;">
-            ⚖️ Legal Contract Risk Analyzer &nbsp;|&nbsp;
-            For demonstration only &nbsp;|&nbsp;
+            Legal Contract Risk Analyzer |
+            Milestone 2 Agentic Edition |
             Not legal advice
         </div>
         """,

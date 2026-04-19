@@ -1,0 +1,56 @@
+{
+    "report_metadata": {
+        "contract_summary": "Error generating summary.",
+        "legal_disclaimer": "AI usage disclaimer: Manual review required."
+    },
+    "risky_clauses": [
+        {
+            "id": 1,
+            "text": "Sudip Kumar Prasad\nPhone: +917679135623\nEmail: sudip.prasad@adypu.edu.in\nLinkedIn \u2022Github \u2022Codeforces \u2022Leetcode \u2022Personal Portfolio\nPROFESSIONAL SUMMARY\nComputer Science undergraduate specializing in AI & ML with hands-on experience in full-stack web development. Proficient\nin building responsive applications and RESTful APIs. Strong problem-solving mindset with consistent practice of data\nstructures and algorithms, solving 200+ LeetCode problems. Active Robotics Club member seeking Software Development,\nFull-Stack, or AI/ML Internship opportunities.\nEDUCATION\nBachelor of Technology (Computer Science) 2024 - 2028\nNewton School Of Technology - Ajeenkya DY Patil University Pune Grade: 7.94/10.0\nIntermediate (Class XII) 2022 - 2023\nHem Sheela Model School Grade: 84.0%\nMatriculation (Class X) 2020 - 2021\nHem Sheela Model School Grade: 90.0%\nINTERNSHIPS\nFrontend Developer April 2025 - May 2025\nGet Interview Confidence Remote\n\u0088Developed responsive and user-friendly web interfaces using React.js , ensuring cross-browser and cross-device\ncompatibility.\n\u0088Built reusable and modular UI components, improving code scalability and reducing development time.\n\u0088Integrated RESTful APIs to handle dynamic data and enable smooth frontend-backend communication.\n\u0088Optimized application performance by reducing unnecessary re-renders and improving load times.\nPROJECTS\nVitalQ ( Github ) ( Demo ) January 2026\n\u0088Developed a full-stack health guidance app using React, Node.js, Express, and MongoDB for symptom-based insights.\n\u0088Implemented secure user authentication, RESTful APIs, and user profile management for storing health history.\n\u0088Designed responsive UI and optimized backend performance to ensure seamless user experience and efficient data handling.\nShopSmart ( Github ) ( Demo ) January 2026\n\u0088Built a scalable full-stack MERN (MongoDB, Express, React, Node.js) e-commerce platform with secure\nauthentication using Google OAuth 2.0 andJWT .\n\u0088Implemented core features including product management, shopping cart, and order processing , ensuring a\nseamless end-to-end user experience.\n\u0088Developed live search and real-time filtering for 500+ products, improving performance and achieving \u02dc40% faster\nbrowsing speed .\nCrickBoard ( Github ) ( Demo ) September 2025\n\u0088Developed a mobile app for managing cricket teams, matches, and player statistics using React Native and Expo.\n\u0088Implemented secure authentication, real-time data synchronization, and player management features using Firebase.\n\u0088Designed intuitive UI with analytics dashboards and performance tracking to enhance user engagement and usability.\nCERTIFICATIONS\nGenerative AI For Everyone DeepLearning.AI ( Link ) April 2025\n\u0088Studied core concepts of generative AI and large language models, including architectures and workflows.",
+            "word_count": 370,
+            "label": "Risky",
+            "confidence": 0.522,
+            "matched_keywords": [],
+            "categories": [],
+            "predictor": "ML Model",
+            "relevant_guidelines": [
+                "IP assignment clauses that grant 'irrevocable, perpetual, royalty-free, worldwide' rights to a counterparty effectively transfer all economic value from the IP owner. Contractors and vendors should be especially vigilant: work-for-hire clauses that assign all created IP to the client should be limited to IP specifically created under the contract scope, not background IP or pre-existing tools and frameworks. Retain a license to your own background IP and clearly define who owns improvements.",
+                "Any contract involving PII should reference compliance with GDPR, CCPA, or applicable data protection laws, and mandate breach notifications within 48-72 hours.",
+                "Liability should be capped at the total amount paid under the contract over the preceding 12 months to avoid catastrophic financial risk."
+            ],
+            "risk_severity": "Unknown",
+            "explanation": "Failed to analyze clause.",
+            "mitigation": "Manual review recommended."
+        },
+        {
+            "id": 2,
+            "text": "\u0088Explored real-world use cases across industries like healthcare, finance, education, and automation systems.\n\u0088Understood limitations, risks, and ethical considerations in AI systems, including bias, privacy concerns.\nAI For Everyone DeepLearning.AI ( Link ) March 2025\n\u0088Built a strong foundation in AI concepts, workflows, and key technologies across various domains.\n\u0088Learned how AI is applied in business operations and real-world decision-making processes effectively.\n\u0088Gained valuable insight into AI strategy, adoption, and overall impact across various industries globally.\nSKILLS\nComputer Languages: Python, TypeScript, HTML, CSS, JavaScript, SQL\nSoftware Packages: Express JS, React Native, Prisma ORM, React, Node.js, MySQL, MongoDB\nAdditional Courses: Data Structure\nSoft Skills: Time management, Decision-making, Teamwork, Responsibility\nOthers: AWS, Git and Github, UI/UX, Problem-Solving, Generative AI, GitHub Actions, Supabase, OAuth 2.0\nEXTRA-CURRICULAR ACTIVITIES\n\u0088Robotics Club Member \u2013 Participated in robotics projects and competitions.\n\u0088Organized Robo Soccer Competition at Tekron Tech Fest \u2013 Managed event planning, team invitations, and point\nmanagement.",
+            "word_count": 151,
+            "label": "Risky",
+            "confidence": 0.542,
+            "matched_keywords": [],
+            "categories": [],
+            "predictor": "ML Model",
+            "relevant_guidelines": [
+                "IP assignment clauses that grant 'irrevocable, perpetual, royalty-free, worldwide' rights to a counterparty effectively transfer all economic value from the IP owner. Contractors and vendors should be especially vigilant: work-for-hire clauses that assign all created IP to the client should be limited to IP specifically created under the contract scope, not background IP or pre-existing tools and frameworks. Retain a license to your own background IP and clearly define who owns improvements.",
+                "Ensure the Force Majeure clause covers pandemics, cyber-attacks, and natural disasters, and provides a clear mechanism for resuming obligations.",
+                "Escrow clauses hold funds or IP in trust pending a future event (e.g., software source code escrow for mission-critical software). Key considerations: the escrow agent should be independent and clearly specified, release conditions must be objectively verifiable, and the costs of maintaining the escrow should be allocated between the parties. For technology contracts, ensure the escrowed materials are sufficient to actually use the software independently."
+            ],
+            "risk_severity": "Unknown",
+            "explanation": "Failed to analyze clause.",
+            "mitigation": "Manual review recommended."
+        }
+    ],
+    "analysis_history": [
+        {
+            "action": "retrieve_guidelines",
+            "clause_id": 1,
+            "guidelines_found": 3
+        },
+        {
+            "action": "retrieve_guidelines",
+            "clause_id": 2,
+            "guidelines_found": 3
+        }
+    ]
+}

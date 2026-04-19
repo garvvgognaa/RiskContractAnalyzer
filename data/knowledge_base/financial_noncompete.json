@@ -1,0 +1,22 @@
+[
+  {
+    "topic": "Non-Compete Clauses",
+    "content": "Non-compete clauses restrict a party from working with competitors or starting a competing business after the contract ends. Courts assess enforceability based on: (1) geographic scope — must be reasonable, not worldwide unless genuinely justified, (2) duration — 6-24 months is typically acceptable; longer is suspect, (3) business scope — must be specific to actual competitive activities, not an entire industry, (4) consideration — must be supported by adequate compensation. In India and many jurisdictions, post-termination non-competes for employees are routinely held unenforceable."
+  },
+  {
+    "topic": "Non-Solicitation Clauses",
+    "content": "Non-solicitation clauses restrict a party from poaching the other party's employees or clients for a defined period. These are generally more enforceable than non-competes because they are narrower. Standard duration: 12-24 months post-contract. Avoid clauses that prohibit even passive acceptance of approaches from employees or clients — those are typically unenforceable overreach."
+  },
+  {
+    "topic": "Interest Rate and Late Payment",
+    "content": "Late payment interest clauses should specify a defined rate (e.g., 1.5% per month, or the statutory rate under the Late Payment of Commercial Debts Act or equivalent). Compound interest is particularly aggressive and may be unenforceable in some jurisdictions. The right to charge interest should not arise until a reasonable grace period (e.g., 30 days) has elapsed after the due date. Ensure the interest rate does not constitute a penalty under applicable law."
+  },
+  {
+    "topic": "Payment Withholding Rights",
+    "content": "Clauses granting one party the right to withhold or deduct payments create significant cash flow risk for the other party. Best practice: any withholding right should be limited to disputed amounts only (not the entire invoice), require prior written notice specifying the reason, and include a dispute resolution mechanism with a time limit. Unilateral set-off rights are particularly aggressive and should be resisted or narrowed."
+  },
+  {
+    "topic": "Escrow Arrangements",
+    "content": "Escrow clauses hold funds or IP in trust pending a future event (e.g., software source code escrow for mission-critical software). Key considerations: the escrow agent should be independent and clearly specified, release conditions must be objectively verifiable, and the costs of maintaining the escrow should be allocated between the parties. For technology contracts, ensure the escrowed materials are sufficient to actually use the software independently."
+  }
+]

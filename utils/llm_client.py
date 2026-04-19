@@ -1,59 +1,70 @@
-import google.generativeai as genai
-import streamlit as st
+   
+
 import os
+import streamlit as st
 from dotenv import load_dotenv
 
-# Load environment variables if running locally without streamlit secrets
 load_dotenv()
 
+
 class LLMClient:
-    """
-    Client for interacting with Google Gemini API.
-    Handles configuration and model initialization.
-    """
-    def __init__(self, model_name="gemini-1.5-flash"):
-        self.api_key = self._get_api_key()
-        if not self.api_key:
-            st.error("GEMINI_API_KEY not found. Please set it in .streamlit/secrets.toml or as an environment variable.")
-            return
+           
 
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel(model_name)
+    def __init__(self, model_name: str = "llama-3.1-8b-instant"):
+        self.model_name = model_name
+        self.client = None
+        self._init_client()
 
-    def _get_api_key(self):
-        # Try Streamlit secrets first
+    def _get_api_key(self) -> str | None:
+                                                                     
         try:
-            return st.secrets["GEMINI_API_KEY"]
-        except (KeyError, FileNotFoundError, AttributeError):
-            # Fallback to environment variable
-            return os.getenv("GEMINI_API_KEY")
+            return st.secrets["GROQ_API_KEY"]
+        except Exception:
+            return os.getenv("GROQ_API_KEY")
+
+    def _init_client(self) -> None:
+        api_key = self._get_api_key()
+        if not api_key:
+            print("[LLMClient] WARNING: GROQ_API_KEY not found. AI analysis will be disabled.")
+            return
+        try:
+            from groq import Groq
+            self.client = Groq(api_key=api_key)
+        except ImportError:
+            print("[LLMClient] ERROR: groq package not installed. Run: pip install groq")
+
+    @property
+    def is_available(self) -> bool:
+        return self.client is not None
 
     def generate_response(self, prompt: str, system_instruction: str = None) -> str:
-        """
-        Generates a response from the LLM based on the given prompt.
-        """
-        if not self.model:
-            return "LLM not initialized properly."
+                   
+        if not self.client:
+            return "LLM not available — GROQ_API_KEY missing or groq package not installed."
+
+        messages = []
+        if system_instruction:
+            messages.append({"role": "system", "content": system_instruction})
+        messages.append({"role": "user", "content": prompt})
 
         try:
-            # Use chat session for better context or just generate_content
-            if system_instruction:
-                # Some versions of genai support system_instruction in initialization
-                # For simplicity, we prepend it to the prompt here if not supported
-                full_prompt = f"System: {system_instruction}\n\nUser: {prompt}"
-            else:
-                full_prompt = prompt
-
-            response = self.model.generate_content(full_prompt)
-            return response.text
+            completion = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=messages,
+                temperature=0.3,                                                           
+                max_tokens=2048,
+            )
+            return completion.choices[0].message.content
         except Exception as e:
             return f"Error generating LLM response: {str(e)}"
 
-# Smoke test
+
+            
 if __name__ == "__main__":
     client = LLMClient()
-    if client.model:
-        print("Testing LLM Client...")
-        # response = client.generate_response("Say 'Hello, AI Legal Assistant!'")
-        # print(f"Response: {response}")
-        print("LLM Client initialized successfully.")
+    if client.is_available:
+        print("Testing Groq LLM Client...")
+        resp = client.generate_response("Say 'Hello, AI Legal Assistant!' and nothing else.")
+        print(f"Response: {resp}")
+    else:
+        print("LLM Client not initialized — check GROQ_API_KEY.")

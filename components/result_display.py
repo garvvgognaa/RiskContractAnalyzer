@@ -1,21 +1,16 @@
-"""
-components/result_display.py
------------------------------
-Streamlit rendering functions for displaying clause analysis results.
-Provides styled cards for risky/safe clauses and summary KPI tiles.
-"""
+   
 
 import streamlit as st
 from typing import Dict, List
 from app_config import COLOUR
 
 
-# ---------------------------------------------------------------------------
-# CSS helper
-# ---------------------------------------------------------------------------
+                                                                             
+            
+                                                                             
 
 def inject_card_styles() -> None:
-    """Inject custom CSS for clause cards, badges, and KPI tiles."""
+                                                                    
     st.markdown(
         f"""
         <style>
@@ -136,23 +131,18 @@ def inject_card_styles() -> None:
     )
 
 
-# ---------------------------------------------------------------------------
-# KPI Summary tiles
-# ---------------------------------------------------------------------------
+                                                                             
+                   
+                                                                             
 
 def render_summary_metrics(stats: Dict) -> None:
-    """
-    Renders four KPI tiles: Total, Risky, Safe, Risk%.
-
-    Args:
-        stats: dict from risk_predictor.compute_summary_stats()
-    """
+           
     col1, col2, col3, col4 = st.columns(4)
 
     cols_data = [
         (col1, str(stats["total"]),                "Total Clauses",   COLOUR["accent_light"]),
-        (col2, str(stats["risky_count"]),           "⚠️ Risky Clauses", COLOUR["border_risky"]),
-        (col3, str(stats["safe_count"]),            "✅ Safe Clauses",  COLOUR["border_safe"]),
+        (col2, str(stats["risky_count"]),           "Risky Clauses", COLOUR["border_risky"]),
+        (col3, str(stats["safe_count"]),            "Safe Clauses",  COLOUR["border_safe"]),
         (col4, f"{stats['risk_percentage']}%",      "Risk Level",       "#F5A623"),
     ]
 
@@ -169,20 +159,15 @@ def render_summary_metrics(stats: Dict) -> None:
             )
 
 
-# ---------------------------------------------------------------------------
-# Individual clause renderers
-# ---------------------------------------------------------------------------
+                                                                             
+                             
+                                                                             
 
 def render_risky_clause(clause: Dict) -> None:
-    """
-    Renders a single risky clause as a styled red card.
-
-    Args:
-        clause: An analyzed clause dict from risk_predictor.analyze_clauses()
-    """
+           
     conf_pct = int(clause["confidence"] * 100)
     keywords_html = "".join(
-        f'<span class="keyword-tag">🔑 {kw}</span>'
+        f'<span class="keyword-tag">{kw}</span>'
         for kw in clause["matched_keywords"]
     )
     categories_html = "".join(
@@ -194,7 +179,7 @@ def render_risky_clause(clause: Dict) -> None:
         f"""
         <div class="risky-card">
             <div class="clause-header">
-                <span class="badge-risky">⚠ RISKY</span>
+                <span class="badge-risky">RISKY</span>
                 <span style="font-size:12px;color:{COLOUR['text_secondary']};margin-left:auto;">
                     {conf_pct}% confidence
                 </span>
@@ -215,26 +200,21 @@ def render_risky_clause(clause: Dict) -> None:
     )
 
 def render_risky_clause_expander(clause: Dict) -> None:
-    """Wrapper using st.expander for risky clauses."""
+                                                      
     conf_pct = int(clause["confidence"] * 100)
-    with st.expander(f"⚠️ CLAUSE #{clause['id']} (Risky) - {conf_pct}% Confidence", expanded=False):
+    with st.expander(f"CLAUSE #{clause['id']} (Risky) - {conf_pct}% Confidence", expanded=False):
         render_risky_clause(clause)
 
 
 def render_safe_clause(clause: Dict) -> None:
-    """
-    Renders a single safe clause as a subtle green card.
-
-    Args:
-        clause: An analyzed clause dict from risk_predictor.analyze_clauses()
-    """
+           
     conf_pct = int(clause["confidence"] * 100)
 
     st.markdown(
         f"""
         <div class="safe-card">
             <div class="clause-header">
-                <span class="badge-safe">✔ SAFE</span>
+                <span class="badge-safe">SAFE</span>
                 <span style="font-size:12px;color:{COLOUR['text_secondary']};margin-left:auto;">
                     {conf_pct}% confidence
                 </span>
@@ -249,20 +229,14 @@ def render_safe_clause(clause: Dict) -> None:
     )
 
 def render_safe_clause_expander(clause: Dict) -> None:
-    """Wrapper using st.expander for safe clauses."""
+                                                     
     conf_pct = int(clause["confidence"] * 100)
-    with st.expander(f"✅ CLAUSE #{clause['id']} (Safe) - {conf_pct}% Confidence", expanded=False):
+    with st.expander(f"CLAUSE #{clause['id']} (Safe) - {conf_pct}% Confidence", expanded=False):
         render_safe_clause(clause)
 
 
 def render_clause_list(analyzed_clauses: List[Dict], show_safe: bool = True) -> None:
-    """
-    Renders all clauses in order, using the appropriate card for each.
-
-    Args:
-        analyzed_clauses: Full list from risk_predictor.analyze_clauses()
-        show_safe: Whether to render safe clauses (default True)
-    """
+           
     for clause in analyzed_clauses:
         if clause["label"] == "Risky":
             render_risky_clause_expander(clause)

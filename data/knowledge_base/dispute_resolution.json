@@ -1,0 +1,18 @@
+[
+  {
+    "topic": "Arbitration Clauses",
+    "content": "Arbitration clauses require disputes to be resolved outside of court. While arbitration can be faster and cheaper, one-sided clauses that specify a single arbitrator chosen by only one party, or require arbitration in an inconvenient jurisdiction, are problematic. Best practice: specify a neutral arbitration body (ICC, AAA, LCIA, or domestic equivalents like SIAC), agree on arbitrator selection jointly, and specify the seat/language of arbitration upfront."
+  },
+  {
+    "topic": "Governing Law and Jurisdiction",
+    "content": "Governing law clauses specify which country or state's laws apply to the contract. This can significantly affect your rights. If you are based in India, a governing law of New York or English law may impose unexpected limitations. Jurisdiction clauses determine where disputes are litigated. Strongly prefer exclusive jurisdiction in your home courts or a mutually neutral location. Ensure the governing law is compatible with mandatory local legislation (e.g., Indian labour law cannot be contracted out)."
+  },
+  {
+    "topic": "Waiver of Rights",
+    "content": "Waiver clauses, especially broad or blanket waivers, can cause a party to surrender important legal rights. A waiver of consequential damages means you cannot recover lost profits, loss of business, or future economic harm — even in cases of clear breach. Waiver of jury trial removes your right to a jury in litigation. Both require very careful consideration. Never include blanket anti-waiver clauses without understanding what rights are being waived."
+  },
+  {
+    "topic": "Dispute Resolution Escalation",
+    "content": "Best practice is a tiered dispute resolution clause: (1) Good faith negotiation between senior management for 30 days, (2) Mediation if negotiation fails, (3) Arbitration or litigation as a last resort. Skipping directly to expensive arbitration for minor disputes is inefficient. Include time limits at each stage to prevent indefinite delay tactics."
+  }
+]

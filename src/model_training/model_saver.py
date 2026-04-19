@@ -1,6 +1,4 @@
-"""
-Persist the best model and the fitted TF-IDF vectorizer to disk.
-"""
+   
 import os
 import joblib
 from src.model_training.config import (
@@ -9,14 +7,7 @@ from src.model_training.config import (
 
 
 def save_best(models: dict, best_name: str, vectorizer) -> None:
-    """
-    Save the best classifier and the fitted vectorizer using joblib.
-
-    Args:
-        models: Dict mapping model name to fitted sklearn estimator.
-        best_name: Key in `models` identifying the best model.
-        vectorizer: Fitted TfidfVectorizer instance.
-    """
+           
     os.makedirs(MODELS_DIR, exist_ok=True)
 
     model_path = os.path.join(MODELS_DIR, BEST_MODEL_FILENAME)

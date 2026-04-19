@@ -2,13 +2,7 @@ import os
 import PyPDF2
 
 def load_text_from_file(file_path: str) -> str:
-    """
-    Reads text data from a PDF or TXT file.
-    Args:
-        file_path (str): The path to the file.
-    Returns:
-        str: The extracted text.
-    """
+           
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"The file {file_path} was not found.")
 

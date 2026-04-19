@@ -1,0 +1,22 @@
+[
+  {
+    "topic": "Termination for Convenience",
+    "content": "Termination for convenience clauses allow one party to end the contract without cause. These are high-risk for service providers and contractors. Best practice: require a minimum notice period (at least 30-90 days) and ensure the departing party compensates for work already performed plus reasonable wind-down costs. One-sided termination rights (only the client can terminate for convenience) should be negotiated to be mutual."
+  },
+  {
+    "topic": "Termination for Cause",
+    "content": "Termination for cause should specify exactly what constitutes a material breach and require a cure period (typically 15-30 days written notice) before the terminating party can actually terminate. Vague cause definitions create litigation risk. Termination clauses should also specify the consequences: what happens to deliverables, IP, and outstanding payments."
+  },
+  {
+    "topic": "Liquidated Damages",
+    "content": "Liquidated damages clauses pre-specify a fixed compensation amount for breach. They are enforceable only if: (1) actual damages would be difficult to calculate, and (2) the pre-set amount is a reasonable estimate of expected harm — not a penalty. Courts routinely strike down punitive liquidated damages clauses. Ensure any liquidated damages clause is capped and clearly justified."
+  },
+  {
+    "topic": "Penalty Clauses",
+    "content": "Pure penalty clauses (designed to punish rather than compensate) are generally unenforceable in most common law jurisdictions. A clause labelled 'penalty' or imposing disproportionate financial consequences for minor breaches is legally vulnerable. Always reframe as 'pre-estimated genuine damages' with supporting justification."
+  },
+  {
+    "topic": "Forfeiture Provisions",
+    "content": "Forfeiture clauses cause one party to lose something of value (e.g., a security deposit, IP rights, or accrued payments) upon breach or termination. These require careful scrutiny. Courts may relieve against forfeiture if the clause is found to be unconscionable. Ensure forfeiture is proportional and tied to specific, clearly defined trigger events."
+  }
+]

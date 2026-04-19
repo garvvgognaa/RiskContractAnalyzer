@@ -1,0 +1,22 @@
+[
+  {
+    "topic": "Intellectual Property Assignment",
+    "content": "IP assignment clauses that grant 'irrevocable, perpetual, royalty-free, worldwide' rights to a counterparty effectively transfer all economic value from the IP owner. Contractors and vendors should be especially vigilant: work-for-hire clauses that assign all created IP to the client should be limited to IP specifically created under the contract scope, not background IP or pre-existing tools and frameworks. Retain a license to your own background IP and clearly define who owns improvements."
+  },
+  {
+    "topic": "Assignment of Contract Rights",
+    "content": "Assignment clauses allow a party to transfer their rights and obligations under the contract to a third party (e.g., in a merger or acquisition). Unilateral assignment rights — where only one party can assign — create risk. Best practice: require written consent from the other party before assignment, except for assignments to affiliates. Include change-of-control provisions so that a buyout by a competitor triggers renegotiation rights."
+  },
+  {
+    "topic": "Sublicensing Rights",
+    "content": "A sublicense grant allows the licensee to further license the IP to third parties. Unrestricted sublicensing erodes your control over proprietary technology or content. Always limit sublicensing to specific use cases, require approval, and ensure sub-licensees are bound by the same restrictions as the primary licensee."
+  },
+  {
+    "topic": "Non-Disclosure and Confidentiality",
+    "content": "NDA / confidentiality clauses should define: (1) what constitutes confidential information with specificity, (2) the duration of confidentiality obligations (perpetual NDAs for genuine trade secrets are common, but 2-5 years is standard for general business information), (3) permitted disclosures (e.g., to employees who need to know, subject to equivalent obligations), and (4) exceptions (publicly available information, information independently developed). Mutual NDAs are preferable to one-sided obligations."
+  },
+  {
+    "topic": "Trade Secret Protection",
+    "content": "Trade secrets receive protection under statute (e.g., India's Economic Espionage Act equivalent, or the EU Trade Secrets Directive) independent of contract. However, contractual obligations reinforce and extend this protection. Ensure the contract specifies: the obligation to use reasonable security measures, the consequences of inadvertent disclosure, and whether the obligation survives termination of the contract."
+  }
+]

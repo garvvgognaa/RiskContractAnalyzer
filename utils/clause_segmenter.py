@@ -1,16 +1,11 @@
-"""
-utils/clause_segmenter.py
---------------------------
-Wraps the existing segmenter logic and adds structured output with
-clause IDs and character counts suitable for Streamlit display.
-"""
+   
 
 import re
 import sys
 import os
 from typing import List, Dict
 
-# Allow importing from src/ even when running from the project root
+                                                                   
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 try:
@@ -21,10 +16,7 @@ except ImportError:
 
 
 def _fallback_segment(text: str) -> List[str]:
-    """
-    Simple fallback clause segmenter in case the src module is unavailable.
-    Splits on double newlines and then on numbered list starters.
-    """
+           
     if not text:
         return []
 
@@ -53,20 +45,7 @@ def _fallback_segment(text: str) -> List[str]:
 
 
 def segment_document(text: str) -> List[Dict]:
-    """
-    Segments the raw contract text into a list of clause dicts.
-
-    Each dict contains:
-        - id          (int)   : 1-based clause index
-        - text        (str)   : the clause text
-        - word_count  (int)   : number of words in the clause
-
-    Args:
-        text (str): Raw contract text.
-
-    Returns:
-        List of clause dicts.
-    """
+           
     if _USE_CORE:
         raw_clauses = _core_segment(text)
     else:
