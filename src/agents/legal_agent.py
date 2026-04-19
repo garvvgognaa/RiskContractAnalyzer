@@ -1,6 +1,7 @@
 import enum
 from typing import List, Dict, Any, Optional
 from utils.llm_client import LLMClient
+from utils.retriever import get_relevant_guidelines
 
 class AgentState(enum.Enum):
     IDLE = "Idle"
@@ -44,7 +45,16 @@ class LegalAgent:
             
             self.set_state(AgentState.RETRIEVING)
             # 2. Retrieve relevant legal guidelines
-            # (To be implemented by Member 2)
+            for clause in clauses:
+                if 'text' in clause:
+                    guidelines = get_relevant_guidelines(clause['text'])
+                    clause['relevant_guidelines'] = guidelines
+                    self.history.append({
+                        "action": "retrieve_guidelines",
+                        "clause_id": clause.get('id', 'unknown'),
+                        "guidelines_found": len(guidelines)
+                    })
+                    print(f"Retrieved {len(guidelines)} guidelines for clause: {clause.get('id', 'unknown')}")
             
             self.set_state(AgentState.REPORTING)
             # 3. Generate structured contract risk reports
