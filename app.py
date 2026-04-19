@@ -24,6 +24,7 @@ from app_config import (
 from utils.file_handler import extract_text_from_upload, get_file_metadata
 from utils.clause_segmenter import segment_document
 from utils.risk_predictor import analyze_clauses, compute_summary_stats
+from utils.export_handler import generate_pdf_report
 from components.result_display import (
     inject_card_styles,
     render_summary_metrics,
@@ -256,7 +257,7 @@ def _render_upload_section():
 # ---------------------------------------------------------------------------
 def _run_pipeline(uploaded_file):
     """
-    Runs the full analysis pipeline with a progress bar.
+    Runs the full analysis pipeline with a status block.
     Returns (analyzed_clauses, stats, metadata) or (None, None, None) on error.
     """
     meta = get_file_metadata(uploaded_file)
@@ -273,59 +274,66 @@ def _run_pipeline(uploaded_file):
         unsafe_allow_html=True,
     )
 
-    progress_bar = st.progress(0, text="Starting analysis…")
-
     try:
-        # Step 1: Extract text
-        progress_bar.progress(20, text="📖 Extracting text from document…")
-        time.sleep(0.3)
-        text = extract_text_from_upload(uploaded_file)
+        with st.status("Agent Reasoning Process", expanded=True) as status:
+            # Step 1: Extract text
+            st.write("📖 Searching document and extracting text...")
+            time.sleep(0.3)
+            text = extract_text_from_upload(uploaded_file)
 
-        if not text or not text.strip():
-            st.error("⚠️ Could not extract any text from the document. Please try a different file.")
-            progress_bar.empty()
-            return None, None, None
+            if not text or not text.strip():
+                status.update(label="Analysis failed", state="error", expanded=True)
+                st.error("⚠️ Could not extract any text from the document. Please ensure the file is not empty or corrupted, and try again.")
+                return None, None, None
 
-        # Step 2: Segment clauses
-        progress_bar.progress(50, text="✂️ Segmenting document into clauses…")
-        time.sleep(0.3)
-        clauses = segment_document(text)
+            # Step 2: Segment clauses
+            st.write("✂️ Segmenting document into logical clauses...")
+            time.sleep(0.3)
+            clauses = segment_document(text)
 
-        if not clauses:
-            st.warning("No clauses could be extracted from this document. Try a more structured contract.")
-            progress_bar.empty()
-            return None, None, None
+            if not clauses:
+                status.update(label="Analysis failed", state="error", expanded=True)
+                st.warning("⚠️ No distinct clauses could be extracted from this document. Try providing a structured contract rather than unstructured notes.")
+                return None, None, None
 
-        # Step 3: Predict risk
-        progress_bar.progress(80, text="🔍 Running risk analysis on each clause…")
-        time.sleep(0.3)
-        analyzed = analyze_clauses(clauses)
-        stats = compute_summary_stats(analyzed)
+            # Step 3: Predict risk
+            st.write("🔍 Assessing liability and risk keywords on each clause...")
+            time.sleep(0.3)
+            analyzed = analyze_clauses(clauses)
+            stats = compute_summary_stats(analyzed)
 
-        progress_bar.progress(100, text="✅ Analysis complete!")
-        time.sleep(0.4)
-        progress_bar.empty()
+            status.update(label="✅ Analysis complete!", state="complete", expanded=False)
 
         return analyzed, stats, meta
 
     except ValueError as e:
-        st.error(f"❌ File Error: {e}")
-        progress_bar.empty()
+        st.error(f"❌ File validation error: {e}. Please upload a valid PDF or TXT file.")
         return None, None, None
     except Exception as e:
-        st.error(f"❌ Unexpected error during analysis: {e}")
-        progress_bar.empty()
+        st.error(f"❌ Unexpected internal error during agent reasoning: {e}")
         return None, None, None
 
 
 # ---------------------------------------------------------------------------
 # Results section
 # ---------------------------------------------------------------------------
-def _render_results(analyzed_clauses, stats, show_safe: bool) -> None:
+def _render_results(analyzed_clauses, stats, meta, show_safe: bool) -> None:
     st.markdown("---")
 
+    col_title, col_btn = st.columns([0.7, 0.3])
+    with col_title:
+        st.markdown('<div class="section-title" style="margin-top:0;">📊 Risk Summary</div>', unsafe_allow_html=True)
+    with col_btn:
+        pdf_bytes = generate_pdf_report(analyzed_clauses, stats, meta)
+        st.download_button(
+            label="📄 Download Assessment",
+            data=pdf_bytes,
+            file_name=f"Risk_Assessment_{meta.get('name', 'Report')}.pdf",
+            mime="application/pdf",
+            help="Download a detailed PDF report of this risk assessment."
+        )
+
     # KPI summary tiles
-    st.markdown('<div class="section-title">📊 Risk Summary</div>', unsafe_allow_html=True)
     render_summary_metrics(stats)
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -422,7 +430,7 @@ def main() -> None:
     if uploaded_file is not None:
         analyzed_clauses, stats, meta = _run_pipeline(uploaded_file)
         if analyzed_clauses is not None:
-            _render_results(analyzed_clauses, stats, show_safe)
+            _render_results(analyzed_clauses, stats, meta, show_safe)
     else:
         _render_empty_state()
 
