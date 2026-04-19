@@ -63,6 +63,18 @@ COLOUR = {
                                                                              
                  
                                                                              
-SIDEBAR_HOW_TO =   
+SIDEBAR_HOW_TO = """
+**How to use:**
+1. Upload a PDF or TXT contract file
+2. The app will split it into clauses
+3. Each clause is scanned for risk indicators
+4. [!] Risky clauses are highlighted in red
+5. [OK] Safe clauses appear in green
 
-SIDEBAR_DISCLAIMER =   
+**Supported formats:** .pdf, .txt
+"""
+
+SIDEBAR_DISCLAIMER = """
+> **Disclaimer:** This tool is for demonstration purposes only and does not constitute legal advice.
+> Always consult a qualified lawyer before signing any contract.
+"""
